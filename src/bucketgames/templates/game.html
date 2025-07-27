@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>{{ game.title }}</title>
+</head>
+<body>
+    <header>
+        <h1>{{ game.title }}</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Releases</h2>
+            <ul>
+                {% for release in game.releases %}
+                <li>
+                    <span class="date">{{ release.date }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
