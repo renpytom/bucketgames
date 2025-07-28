@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link href="/_static/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>{{ page.title }}</title>
+</head>
+
+<body>
+
+    <div class="container">
+
+        {%if bucket.description %}
+        <div class="content mt-3">
+            {{ bucket.description | markdown }}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for game in bucket.games %}
+            <div class="col-md-4 mt-3 content mb-3 me-3" >
+                {% if game.image_link('cover') %}
+                <a href="{{ game.directory }}/"><img src="{{game.directory}}/{{ game.image_link('cover') }}" alt="Cover image for {{ game.title }}" class="img-fluid"></a>
+                {% endif %}
+
+                <h5><a href="{{ game.directory }}/">{{ game.title }}</a></h5>
+
+                {{ game.short | markdown }}
+            </div>
+
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script src="/_static/bootstrap.bundle.min.js"></script>
+    <script src="script.js" defer></script>
+</body>
+
+</html>

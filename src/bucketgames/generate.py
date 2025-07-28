@@ -41,6 +41,7 @@ from markupsafe import Markup
 # Globals.
 bucket_path: pathlib.Path
 
+DEFAULT_IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp"]
 
 class Proxy():
     """
@@ -125,40 +126,19 @@ class Release:
         """
         return Proxy(self)
 
-linked: set[pathlib.Path]
+
+linked: set[pathlib.Path] = set()
 """A set of paths that have already been linked using Game.link(), and so don't need to be copied again."""
 
+
 @dataclasses.dataclass
-class Game:
-    """
-    Represents a game.
-    """
+class Page:
 
     path: pathlib.Path
     "The path to the game directory."
 
     website_path: pathlib.Path
     "The path to the website directory for this game."
-
-    date: datetime.datetime
-    "The date of the game. Typically the date of the latest release, unless overridden."
-
-    releases: list[Release]
-    "The releases of the game."
-
-    screenshots: list[Screenshot]
-    "The screenshots of the game, if any."
-
-    toml: dict[str, Any]
-    "The contents of the game's `game.toml` file, if it exists."
-
-    def proxy(self) -> Proxy:
-        """
-        Returns a Proxy object for this game, allowing access to its attributes and toml keys.
-        """
-        rv = Proxy(self)
-        rv.releases = [r.proxy() for r in self.releases]
-        return rv
 
     def link(self, filename: str) -> str | None:
         """
@@ -198,6 +178,56 @@ class Game:
                 return image_link
 
         return None
+
+
+@dataclasses.dataclass
+class Game(Page):
+    """
+    Represents a game.
+    """
+    directory: str
+    "The directory the game lives in, relative to the bucket root, using forward slashes. Doesn't include the separator."
+
+    date: datetime.datetime
+    "The date of the game. Typically the date of the latest release, unless overridden."
+
+    releases: list[Release]
+    "The releases of the game."
+
+    screenshots: list[Screenshot]
+    "The screenshots of the game, if any."
+
+    toml: dict[str, Any]
+    "The contents of the game's `game.toml` file, if it exists."
+
+    def proxy(self) -> Proxy:
+        """
+        Returns a Proxy object for this game, allowing access to its attributes and toml keys.
+        """
+        rv = Proxy(self)
+        rv.releases = [r.proxy() for r in self.releases] # type: ignore
+        return rv
+
+
+
+
+@dataclasses.dataclass
+class Bucket(Page):
+
+    games: list[Game]
+    "The games in the bucket."
+
+    toml: dict[str, Any]
+    "The contents of the bucket's `bucket.toml` file, if it exists."
+
+    def proxy(self) -> Proxy:
+        """
+        Returns a Proxy object for this bucket, allowing access to its attributes and toml keys.
+        """
+        rv = Proxy(self)
+        rv.games = [g.proxy() for g in self.games] #type: ignore
+        return rv
+
 
 
 def to_markdown(text):
@@ -350,7 +380,7 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
     except tomllib.TOMLDecodeError as e:
         raise SystemExit(f"Error decoding {game_toml_path}: {e}")
 
-    game_toml.setdefault("image_extensions", [".png", ".jpg", ".jpeg", ".gif", ".webp"])
+    game_toml.setdefault("image_extensions", DEFAULT_IMAGE_EXTENSIONS)
 
     if website_path.is_dir():
         shutil.rmtree(website_path)
@@ -411,6 +441,7 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
     game = Game(
         path=game_path,
         website_path=website_path,
+        directory=game_path.name,
         date=date,
         releases=releases,
         screenshots=screenshots,
@@ -474,9 +505,61 @@ def generate(bucket: str) -> None:
     copy_resource(importlib.resources.files("bucketgames") / "_static", website / "_static")
 
     # Games.
+
+    games: list[Game] = []
+
     for i in bucket_path.iterdir():
 
         if (i / "game.toml").is_file():
-            generate_game(i, website / i.name)
+            game = generate_game(i, website / i.name)
+            games.append(game)
+
+    games.sort(key=lambda g: g.date, reverse=True)
+
+    # Load bucket.toml.
+
+    bucket_toml_path = bucket_path / "bucket.toml"
+
+    if not bucket_toml_path.is_file():
+        raise SystemExit(f"Missing bucket.toml file: {bucket_toml_path}")
+
+    try:
+        with open(bucket_toml_path, "rb") as f:
+            bucket_toml = tomllib.load(f)
+    except tomllib.TOMLDecodeError as e:
+        raise SystemExit(f"Error decoding {bucket_toml_path}: {e}")
+
+    bucket_toml.setdefault("image_extensions", DEFAULT_IMAGE_EXTENSIONS)
+
+    bucket_object = Bucket(
+        path=bucket_path,
+        website_path=website,
+        games=games,
+        toml=bucket_toml
+    )
+
+    proxy = bucket_object.proxy()
+
+    apply_template(
+        destination=website / "index.html",
+        template="bucket.html",
+        game_path=bucket_path,
+        bucket=proxy,
+        page=proxy,
+    )
+
+    apply_template(
+        destination=website / "style.css",
+        template="style.css",
+        game=proxy,
+        page=proxy,
+    )
+
+    apply_template(
+        destination=website / "script.js",
+        template="script.js",
+        game=proxy,
+        page=proxy,
+    )
 
     print("Website files generated successfully.")

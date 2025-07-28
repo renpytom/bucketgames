@@ -70,14 +70,14 @@
                         </li>
                         {% endfor %}
                     </ul>
+
+                    <dl>
+                        <dt>Released</dt>
+                        <dd>{{ release.date | date }}</dd>
+                    </dl>
+
                 </div>
                 {% endfor %}
-
-
-                <dl>
-                    <dd>Released</dd>
-                    <dd>{{ release.date | date }}</dd>
-                </dl>
 
             </div>
 
