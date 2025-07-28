@@ -24,10 +24,10 @@
             {% for game in bucket.games %}
             <div class="col-md-4 mt-3 content mb-3 me-3" >
                 {% if game.image_link('cover') %}
-                <a href="{{ game.directory }}/"><img src="{{game.directory}}/{{ game.image_link('cover') }}" alt="Cover image for {{ game.title }}" class="img-fluid"></a>
+                <a href="{{ game.directory }}/index.html"><img src="{{game.directory}}/{{ game.image_link('cover') }}" alt="Cover image for {{ game.title }}" class="img-fluid"></a>
                 {% endif %}
 
-                <h5><a href="{{ game.directory }}/">{{ game.title }}</a></h5>
+                <h5><a href="{{ game.directory }}/index.html">{{ game.title }}</a></h5>
 
                 {{ game.short | markdown }}
             </div>

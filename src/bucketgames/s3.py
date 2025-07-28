@@ -165,7 +165,6 @@ def sync_directory_to_s3(
 
         # Test connection
         s3_client.head_bucket(Bucket=bucket_name)
-
     except NoCredentialsError:
         raise NoCredentialsError()
     except ClientError as e:
@@ -266,11 +265,35 @@ def sync_directory_to_s3(
 
     # No return value
 
+MULTIPART_CHUNKSIZE = 8 * 1024 * 1024  # 8 MB for multipart uploads
 
 def _calculate_md5(file_path: Path) -> str:
     """Calculate MD5 hash of a file."""
     hash_md5 = hashlib.md5()
+    parts = 0
+
     with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
+        f.seek(0, 2)
+        file_size = f.tell()
+        f.seek(0)
+
+        if file_size <= MULTIPART_CHUNKSIZE:
+            # For small files, read the whole file at once
+            data = f.read()
+            hash_md5.update(data)
+
+        else:
+            while True:
+                data = f.read(MULTIPART_CHUNKSIZE)
+                if not data:
+                    break
+
+                parts += 1
+
+                # Update the running hash with a hash of the current chunk.
+                hash_md5.update(hashlib.md5(data).digest())
+
+    if parts == 0:
+        return hash_md5.hexdigest()
+    else:
+        return f"{hash_md5.hexdigest()}-{parts}"

@@ -76,20 +76,14 @@ class Credentials:
 def upload_callback(event_type: str, key: str | None = None, error_info: str | None = None) -> None:
     """
     Callback function to handle upload events.
-
-    Args:
-        event_type (str): The type of event ("upload", "skip", "delete", "error").
-        key (str or None): The relative file path or S3 key involved, or None for general errors.
-        error_info (str or None): Error message if event_type is "error", otherwise None.
-
-    Returns:
-        None
     """
 
     if event_type == "uploaded":
         print(f"Uploaded: {key}")
     elif event_type == "deleted":
         print(f"Deleted: {key}")
+    elif event_type == "skipped":
+        print(f"Skipped: {key}")
     elif event_type == "error":
         print(f"Error with {key}: {error_info}")
     elif event_type == "dryrun_upload":
