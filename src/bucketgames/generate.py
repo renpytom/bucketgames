@@ -64,6 +64,17 @@ class Proxy():
 
         raise AttributeError(field, self)
 
+
+@dataclasses.dataclass
+class Screenshot:
+
+    src: str
+    "The path to the screenshot image, relative to the game directory."
+
+    name: str
+    "The name of the screenshot file, without the path."
+
+
 @dataclasses.dataclass
 class File:
     """
@@ -134,6 +145,9 @@ class Game:
 
     releases: list[Release]
     "The releases of the game."
+
+    screenshots: list[Screenshot]
+    "The screenshots of the game, if any."
 
     toml: dict[str, Any]
     "The contents of the game's `game.toml` file, if it exists."
@@ -379,6 +393,19 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
 
         date = max(r.date for r in releases)
 
+    # Locate screenshot
+
+    screenshots = [ ]
+
+    for screenshot_path in ( game_path / "screenshots" ).iterdir():
+        if screenshot_path.suffix in game_toml["image_extensions"]:
+            screenshots.append(Screenshot(
+                src=str(screenshot_path.relative_to(game_path)).replace('\\', '/'),
+                name=screenshot_path.name
+            ))
+
+    screenshots.sort(key=lambda s: s.name)
+
     # Create the game object.
 
     game = Game(
@@ -386,6 +413,7 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
         website_path=website_path,
         date=date,
         releases=releases,
+        screenshots=screenshots,
         toml=game_toml
     )
 
@@ -402,6 +430,14 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
     apply_template(
         destination=website_path / "style.css",
         template="style.css",
+        game_path=game_path,
+        game=proxy,
+        page=proxy,
+    )
+
+    apply_template(
+        destination=website_path / "script.js",
+        template="script.js",
         game_path=game_path,
         game=proxy,
         page=proxy,

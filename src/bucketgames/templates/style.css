@@ -13,3 +13,7 @@ body {
     background-color: #ffffff;
     border-radius: 8px;
 }
+
+.thumbnail {
+    border-radius: 4px;
+}

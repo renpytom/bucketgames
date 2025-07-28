@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +9,23 @@
     <link rel="stylesheet" href="style.css">
     <title>{{ game.title }}</title>
 </head>
+
 <body>
+
+    <div class="modal fade" id="screenshotModal" tabindex="-1" aria-labelledby=screenshotModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 98%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="screenshotModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="screenshotModalImage" src="" alt="Screenshot" class="img-fluid mx-auto d-block">
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="content d-inline-block mt-2">
         <a href="..">All games</a>
@@ -24,33 +41,38 @@
                 {{ game.description | markdown }}
 
                 {% for release in game.releases %}
-                    <div class="release">
-                        <h2>Release {{ release.version }}</h2>
-                        <p>Released {{ release.date | date}}</p>
-                        <p>{{ release.description | markdown }}</p>
+                <div class="release">
+                    <h2>Release {{ release.version }}</h2>
+                    <p>Released {{ release.date | date}}</p>
+                    <p>{{ release.description | markdown }}</p>
 
-                        <ul>
-                            {% for file in release.files %}
-                                <li>
-                                    <a href="{{ file.link }}">{{ file.name }}</a>
-                                    {% if file.size %}
-                                        ({{ file.size | filesizeformat }})
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <ul>
+                        {% for file in release.files %}
+                        <li>
+                            <a href="{{ file.link }}">{{ file.name }}</a>
+                            {% if file.size %}
+                            ({{ file.size | filesizeformat }})
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
                 {% endfor %}
 
             </div>
 
-
+            <div class="col-md-4">
+                {% for screenshot in game.screenshots %}
+                <img src="{{ screenshot.src }}" alt="Screenshot" style="cursor: pointer" class="img-fluid mb-3 thumbnail" data-name="{{ screenshot.name }}" data-src="{{ screenshot.src }}" data-bs-toggle="modal" data-bs-target="#screenshotModal">
+                {% endfor %}
+            </div>
 
         </div>
 
     </div>
 
     <script src="script.js" defer></script>
-    <script src="/_statc/bootstrap.bundle.min.js"></script>
+    <script src="/_static/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
