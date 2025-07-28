@@ -1,0 +1,27 @@
+# The title of the page.
+title = "Game Name"
+
+# A short blurb about the game, used in the bucket page, in Markdown format.
+short = "A new game."
+
+# This is text that goes above the games, in Markdown format.
+description = """
+# Game Name
+
+A new game - but far from the last one.
+"""
+
+# The license for the game, in markdown format.
+license = """
+License text goes here.
+"""
+
+# Custom CSS for the page.
+css = """
+// CSS goes here.
+"""
+
+# Custom JavaScript for the page.
+js = """
+// JavaScript goes here.
+"""

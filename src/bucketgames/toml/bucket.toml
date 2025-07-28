@@ -1,0 +1,19 @@
+# The title of the page.
+title = "Studio Name"
+
+# This is text that goes above the games, in Markdown format.
+description = """
+# Studio Name
+
+We make games and then we put them in a bucket.
+"""
+
+# Custom CSS for the page.
+css = """
+// CSS goes here.
+"""
+
+# Custom JavaScript for the page.
+js = """
+// JavaScript goes here.
+"""

@@ -1,6 +1,3 @@
-
-
-
 let screenshotModal = document.getElementById('screenshotModal')
 if (screenshotModal) {
     screenshotModal.addEventListener('show.bs.modal', function (event) {

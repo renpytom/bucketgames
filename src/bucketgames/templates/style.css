@@ -1,9 +1,5 @@
 body {
-{% if page.image_link("background") %}
-    background: url("{{ page.image_link('background') }}") repeat;
-{% else %}
-    background: {{ page.background | default('#ada') }};
-{% endif %}
+    background: #ada;
     padding-left: 12px;
     padding-right: 12px;
 }

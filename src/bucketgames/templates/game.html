@@ -41,7 +41,6 @@
         <div class="row content">
 
             <div class="col-md-8">
-                <h1>{{ game.title }}</h1>
 
                 {{ game.description | markdown }}
 
@@ -84,6 +83,11 @@
                 </div>
                 {% endfor %}
 
+                {% if game.license %}
+                <h2>License</h2>
+                    {{ game.license | markdown }}
+                {% endif %}
+
             </div>
 
             <div class="col-md-4">
@@ -96,8 +100,9 @@
 
     </div>
 
-    <script src="script.js" defer></script>
     <script src="/_static/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>{{ page.js }}</script>
 </body>
 
 </html>
