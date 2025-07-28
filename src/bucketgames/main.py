@@ -25,6 +25,7 @@ import argparse
 from . import generate
 from . import webserver
 from . import upload
+from . import new
 
 def main():
 
@@ -40,6 +41,11 @@ def main():
 
     sp = sps.add_parser("serve", help="Run the web server to serve the website files")
 
+    sp = sps.add_parser("init", help="Create a new bucket directory")
+
+    sp = sps.add_parser("add", help="Add a new game to the bucket")
+    sp.add_argument("game", help="The name of the game to add.")
+
     args = ap.parse_args()
 
     match args.command:
@@ -51,6 +57,10 @@ def main():
                 webserver.start(args.bucket)
         case "serve":
             webserver.start(args.bucket)
+        case "init":
+            new.init_bucket(args.bucket)
+        case "add":
+            new.add_game(args.bucket, args.game)
         case _:
             ap.error("Unknown command.")
 
