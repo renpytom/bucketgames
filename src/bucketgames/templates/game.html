@@ -40,11 +40,25 @@
 
                 {{ game.description | markdown }}
 
+                <dl>
+
+                    {% if game.platforms %}
+                    <dt>Platforms</dt>
+                    <dd>{{ game.platforms }}</dd>
+                    {% endif %}
+
+                    {% if game.made_with %}
+                    <dt>Made with</dt>
+                    <dd>{{ game.made_with }}</dd>
+                    {% endif %}
+
+                </dl>
+
+
                 {% for release in game.releases %}
                 <div class="release">
                     <h2>Release {{ release.version }}</h2>
-                    <p>Released {{ release.date | date}}</p>
-                    <p>{{ release.description | markdown }}</p>
+                    {{ release.description | markdown }}
 
                     <ul>
                         {% for file in release.files %}
@@ -58,6 +72,12 @@
                     </ul>
                 </div>
                 {% endfor %}
+
+
+                <dl>
+                    <dd>Released</dd>
+                    <dd>{{ release.date | date }}</dd>
+                </dl>
 
             </div>
 
