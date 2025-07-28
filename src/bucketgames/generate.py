@@ -3,13 +3,18 @@ from typing import Any
 import dataclasses
 import datetime
 import dateutil.parser
+import importlib.resources
+import importlib.resources.abc
+import markdown
 import packaging.version
 import pathlib
 import re
 import shutil
 import tomllib
 
+
 from jinja2 import Environment, select_autoescape, FileSystemLoader, ChoiceLoader, PackageLoader
+from markupsafe import Markup
 
 # Globals.
 bucket_path: pathlib.Path
@@ -25,7 +30,8 @@ class Proxy():
 
     def __getattr__(self, field: str):
         """
-        Returns the value of the field from the underlying object or its toml attribute.
+        Returns the value of the field from the underlying object or its toml attribute. Returns None
+        if the field does not exist.
         """
 
         if hasattr(self.target, field):
@@ -42,8 +48,11 @@ class File:
     Represents a file inside a release.
     """
 
-    directory: str
+    link: str
     "The path to the file, relative to the bucket root, using forward slashes."
+
+    name: str
+    "The name of the file, without the path."
 
     size: int
     "The size of the file in bytes."
@@ -155,6 +164,24 @@ class Game:
         return None
 
 
+def to_markdown(text):
+    """
+    Converts the given text to Markdown format. If the text is None, returns an empty string.
+    """
+    if isinstance(text, str):
+        return Markup(markdown.markdown(text, extensions=["extra"]))
+
+    return text
+
+def to_date(date):
+    """
+    Converts the given text to a datetime object. If the text is None, returns the text unchanged.
+    """
+    if isinstance(date, datetime.datetime):
+        return date.strftime("%Y-%m-%d")
+
+    return date
+
 def apply_template(destination: pathlib.Path, template: str, game_path: pathlib.Path|None=None, **kwargs: Any):
     """
     Locates a Jinja2 template file, renders it with the given keyword arguments, and writes the result to a file.
@@ -183,6 +210,9 @@ def apply_template(destination: pathlib.Path, template: str, game_path: pathlib.
         loader=ChoiceLoader(loaders),
         autoescape=select_autoescape(['html', 'xml'])
     )
+
+    env.filters['markdown'] = to_markdown
+    env.filters['date'] = to_date
 
     t = env.get_template(template)
 
@@ -223,7 +253,8 @@ def scan_release(game_path: pathlib.Path, release_path: pathlib.Path) -> Release
         file_date = datetime.datetime.fromtimestamp(file_stat.st_mtime)
 
         files.append(File(
-            directory=str(file_path.relative_to(game_path)).replace('\\', '/'),
+            link=str(file_path.relative_to(game_path)).replace('\\', '/'),
+            name=file_path.name,
             size=file_stat.st_size,
             date=file_date
         ))
@@ -343,6 +374,7 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
         template="game.html",
         game_path=game_path,
         game=proxy,
+        page=proxy,
     )
 
     apply_template(
@@ -350,9 +382,23 @@ def generate_game(game_path: pathlib.Path, website_path: pathlib.Path) -> Game:
         template="style.css",
         game_path=game_path,
         game=proxy,
+        page=proxy,
     )
 
     return game
+
+def copy_resource(source: importlib.resources.abc.Traversable, target: pathlib.Path) -> None:
+    """
+    Copies a resource to the target path.
+    """
+
+    if source.is_dir():
+        target.mkdir(exist_ok=True, parents=True)
+        for child in source.iterdir():
+            copy_resource(child, target / child.name)
+    else:
+        target.write_bytes(source.read_bytes())
+
 
 def generate(bucket: str) -> None:
     """
@@ -366,6 +412,10 @@ def generate(bucket: str) -> None:
 
     website.mkdir(exist_ok=True)
 
+    # Copy static files.
+    copy_resource(importlib.resources.files("bucketgames") / "_static", website / "_static")
+
+    # Games.
     for i in bucket_path.iterdir():
 
         if (i / "game.toml").is_file():

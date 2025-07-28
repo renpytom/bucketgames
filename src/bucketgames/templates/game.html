@@ -4,24 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <link rel="stylesheet" href="/static/style.css">
+    <link href="/_static/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <title>{{ game.title }}</title>
 </head>
 <body>
-    <header>
-        <h1>{{ game.title }}</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Releases</h2>
-            <ul>
+
+    <div class="content d-inline-block mt-2">
+        <a href="..">All games</a>
+    </div>
+
+    <div class="container mt-2">
+
+        <div class="row content">
+
+            <div class="col-md-8">
+                <h1>{{ game.title }}</h1>
+
+                {{ game.description | markdown }}
+
                 {% for release in game.releases %}
-                <li>
-                    <span class="date">{{ release.date }}</span>
-                </li>
+                    <div class="release">
+                        <h2>Release {{ release.version }}</h2>
+                        <p>Released {{ release.date | date}}</p>
+                        <p>{{ release.description | markdown }}</p>
+
+                        <ul>
+                            {% for file in release.files %}
+                                <li>
+                                    <a href="{{ file.link }}">{{ file.name }}</a>
+                                    {% if file.size %}
+                                        ({{ file.size | filesizeformat }})
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endfor %}
-            </ul>
-        </section>
-    </main>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <script src="script.js" defer></script>
+    <script src="/_statc/bootstrap.bundle.min.js"></script>
 </body>
 </html>
