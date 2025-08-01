@@ -18,7 +18,7 @@ License text goes here.
 
 # Custom CSS for the page.
 css = """
-// CSS goes here.
+/* CSS goes here. */
 """
 
 # Custom JavaScript for the page.
