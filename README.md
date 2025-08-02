@@ -58,7 +58,6 @@ If using Cloudflare R2, documentation can be found here: https://www.cloudflare.
     - If using CloudFlare R2, the domain will need to be added to your CloudFlare account first
 - If using AWS S3, enable website hosting (https://docs.aws.amazon.com/AmazonS3/latest/userguide/EnableWebsiteHosting.html)
 - (Recommended) Go to the billing and related sections of your dashboard and set any available limits, notifications, and settings to avoid unexpected charges
-    - Note: Notifications may not work unless the bucket has a custom domain
 
 ## Static Site (Not S3-Compatible)
 
