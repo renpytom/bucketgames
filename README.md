@@ -34,10 +34,10 @@ Prequisite packages will be automatically installed with uv before the first `uv
 ## Add and Configure Games
 
 - Add game: `uv run bucketgames [bucket name] add [game name]`
-- Configure the game.toml file created in bucketgames/[bucket]/[game]/game.toml
-- Add screenshots for the game to bucketgames/[bucket]/[game]/screenshots (you may have to create the folder)
-- Add release downloads to a new folder bucketgames/[bucket]/[game]/[release name], e.g. bucketgames/testbucket/my_game/0.0.1/
-- Add game cover image to bucketgames/[bucket]/[game]/cover.jpg or .../cover.png
+- Configure the game.toml file created in `bucketgames/[bucket]/[game]/game.toml`
+- Add screenshots for the game to `bucketgames/[bucket]/[game]/screenshots` (you may have to create the folder)
+- Add release downloads to a new folder `bucketgames/[bucket]/[game]/[release name]`, e.g. `bucketgames/testbucket/my_game/0.0.1/`
+- Add game cover image to `bucketgames/[bucket]/[game]/cover.jpg` or `.../cover.png`
 
 ## Generate and Test Static Site
 `uv run bucketgames [bucket name] generate --serve`
@@ -48,7 +48,7 @@ CloudFlare R2 and Documentation can be found here: https://www.cloudflare.com/de
 
 Other S3-compatible storage can be used as well.
 
-Add S3-compatible credentials to bucketgames/[bucket]/credentials.toml
+Add S3-compatible credentials to `bucketgames/[bucket]/credentials.toml`
 
 ## Static Site (Not S3-Compatible)
 
@@ -60,6 +60,7 @@ Please be sure to:
 3. Ensure your hosting allows for your use-case
 
 # Upload
+
 `uv run bucketgames [bucket name] upload`
 
 Once complete, the site will be available at the public bucket URL.
