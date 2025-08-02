@@ -10,19 +10,20 @@ Host games on S3-compatible buckets.
 - git (optional)
 - S3-compatible storage, such as Cloudflare R2
     - Alternatively, static site hosting with adequate storage and bandwidth
+- A domain to access the site (see "Cloud Setup" section)
 
 ### Download or Clone the files
 
 #### Option 1: Git Clone
 
 -  Clone the repository `git clone https://github.com/renpytom/bucketgames.git` 
-    - Developers: please use ssh to allow pushing to GitHub
+    - Developers: use ssh to allow pushing
 - Switch to the folder in the terminal with `cd bucketgames`
 
 #### Option 2: Download ZIP 
 
 - Click the green "Code" button at the top of the GitHub page, and find the "Download ZIP" option. Download the ZIP file by clicking on it.
-    - Alternatively, the ZIP file should be available at: https://github.com/renpytom/bucketgames/archive/refs/heads/main.zip
+    - Alternatively, the ZIP file is available at: https://github.com/renpytom/bucketgames/archive/refs/heads/main.zip
 - Extract the ZIP file to an appropriate directory
 - Open a terminal in the newly extracted "bucketgames" directory
 
@@ -47,7 +48,17 @@ Prequisite packages will be automatically installed with uv before the first `uv
 
 If using Cloudflare R2, documentation can be found here: https://www.cloudflare.com/developer-platform/products/r2/
 
-Add S3-compatible bucket credentials to `bucketgames/[bucket]/credentials.toml`
+## S3-Compatible Storage
+
+- Create a bucket for your games
+- Generate an API key that can read and write to the bucket
+- Add API credentials to `bucketgames/[bucket]/credentials.toml`
+- Enable public access and configure and add your domain
+    - If you don't have a domain, you may need to purchase one, or you may be able to use the one assigned to the bucket, depending on the platform. 
+    - If using CloudFlare R2, the domain will need to be added to your CloudFlare account first
+- If using AWS S3, enable website hosting (https://docs.aws.amazon.com/AmazonS3/latest/userguide/EnableWebsiteHosting.html)
+- (Recommended) Go to the billing and related sections of your dashboard and set any available limits, notifications, and settings to avoid unexpected charges
+    - Note: Notifications may not work unless the bucket has a custom domain
 
 ## Static Site (Not S3-Compatible)
 
@@ -62,4 +73,4 @@ Please be sure to:
 
 `uv run bucketgames [bucket] upload`
 
-Once complete, the site will be available at the public bucket URL.
+Once complete, the site will be available at the public bucket URL. You may have to navigate to `[public bucket URL]/index.html`.
