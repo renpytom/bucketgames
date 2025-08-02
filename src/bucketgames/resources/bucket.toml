@@ -10,7 +10,7 @@ We make games and then we put them in a bucket.
 
 # Custom CSS for the page.
 css = """
-// CSS goes here.
+/* CSS goes here. */
 """
 
 # Custom JavaScript for the page.
