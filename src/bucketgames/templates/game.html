@@ -102,7 +102,9 @@
 
     <script src="/_static/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
-    <script>{{ page.js }}</script>
+    <script>
+        {% autoescape false %}{{ page.js }}{% endautoescape %}
+    </script>
 </body>
 
 </html>
